@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_PIPE } from '@nestjs/core';
+import { Todo } from './todo.entity';
 
 @Module({
   imports: [
@@ -13,12 +14,13 @@ import { APP_PIPE } from '@nestjs/core';
       username: 'charlie',
       password: '1331',
       database: 'todo_list_nest',
-      entities: [],
+      entities: [Todo],
       synchronize: true,
       keepConnectionAlive: true,
       dropSchema: true,
       // logging: true,
     }),
+    TypeOrmModule.forFeature([Todo]),
   ],
   controllers: [AppController],
   providers: [
@@ -27,7 +29,6 @@ import { APP_PIPE } from '@nestjs/core';
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
-],
+  ],
 })
 export class AppModule {}
-

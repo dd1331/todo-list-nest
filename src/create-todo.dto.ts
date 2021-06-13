@@ -1,14 +1,15 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { TITLE_REQUIRED, CONTENT_REQUIRED } from './http-messages';
 
-export class CreatTodoDto {
-	@ApiProperty()
-	@IsString()
-	@IsNotEmpty()
-	title: string
-	
-	@ApiProperty()
-	@IsString()
-	@IsNotEmpty()
-	content: string
+export class CreateTodoDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: TITLE_REQUIRED })
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: CONTENT_REQUIRED })
+  content: string;
 }

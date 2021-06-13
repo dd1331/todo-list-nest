@@ -1,16 +1,14 @@
-
 import { Entity, Column } from 'typeorm';
 import { CommonEntity } from './common.entity';
 
 @Entity()
-export class Item extends CommonEntity {
+export class Todo extends CommonEntity {
   @Column()
   title: string;
 
   @Column()
   content: string;
 
-  @Column()
-  status: boolean;
-
+  @Column({ default: 'todo' })
+  status: string;
 }

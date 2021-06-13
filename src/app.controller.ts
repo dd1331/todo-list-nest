@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Param, Put, Delete, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Put,
+  Delete,
+  Body,
+} from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreatTodoDto } from './create-todo.dto';
+import { CreateTodoDto } from './create-todo.dto';
+import { Todo } from './todo.entity';
 
 @Controller()
 export class AppController {
@@ -10,26 +19,24 @@ export class AppController {
   getTodoList(): string {
     return this.appService.getTodoList();
   }
-  
+
   @Post('/todos')
-  createTodoItem(@Body() dto: CreatTodoDto): string {
-    // console.log(dto)
-    return this.appService.createTodoItem(dto);
+  createTodo(@Body() dto: CreateTodoDto): Promise<Todo> {
+    return this.appService.createTodo(dto);
   }
 
   @Get('/todos/:id')
-  getTodoItem(@Param('id') id: string): string {
-    return this.appService.getTodoItem(id);
+  getTodo(@Param('id') id: string): string {
+    return this.appService.getTodo(id);
   }
-  
+
   @Put('/todos/:id')
   toggleTodoStatus(@Param('id') id: string): string {
     return this.appService.toggleTodoStatus(id);
   }
 
   @Delete('/todos/:id')
-  deleteTodoItem(@Param('id') id: string): string {
-    return this.appService.deleteTodoItem(id);
+  deleteTodo(@Param('id') id: string): string {
+    return this.appService.deleteTodo(id);
   }
-  
 }
