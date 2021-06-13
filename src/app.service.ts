@@ -25,15 +25,22 @@ export class AppService {
     return todos;
   }
   async getTodo(id: string): Promise<Todo> {
-    console.log(id);
     const todo = await this.todoRepo.findOne(id);
 
     if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
 
     return todo;
   }
-  toggleTodoStatus(id: string): string {
-    return 'Hello World!';
+  async toggleTodoStatus(id: string): Promise<Todo> {
+    const todo = await this.todoRepo.findOne(id);
+
+    if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
+
+    if (todo.status === 'todo') todo.status = 'done';
+
+    await todo.save();
+
+    return todo;
   }
   deleteTodo(id: string): string {
     return 'Hello World!';

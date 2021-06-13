@@ -31,7 +31,7 @@ export class AppController {
   }
 
   @Put('/todos/:id')
-  toggleTodoStatus(@Param('id') id: string): string {
+  toggleTodoStatus(@Param('id') id: string): Promise<Todo> {
     return this.appService.toggleTodoStatus(id);
   }
 

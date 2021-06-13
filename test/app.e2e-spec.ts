@@ -85,12 +85,18 @@ describe('AppController (e2e)', () => {
       },
     );
   });
-
-  it('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', async () => {
-    const id = 1;
-    const res = await request(agent).put(`/todos/${id}`).expect(HttpStatus.OK);
+  describe('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', () => {
+    it('PUT /todos/:id: 투두 디테일 상태 변경 성공 ', async () => {
+      const { id, status, updatedAt } = createdTodos[0];
+      const updatedStatus = status === 'todo' ? 'done' : 'todo';
+      const { body } = await request(agent)
+        .put(`/todos/${id}`)
+        .expect(HttpStatus.OK);
+      expect(body.status).toBeDefined();
+      expect(body.status).toBe(updatedStatus);
+      expect(body.updatedAt).not.toBe(updatedAt);
+    });
   });
-
   it('DELETE /todos/:id: 투두 삭제', async () => {
     const id = 1;
     const res = await request(agent)
