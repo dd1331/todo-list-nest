@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateTodoDto } from './create-todo.dto';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { Todo } from './todo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TODO_NOT_FOUND } from './http-messages';
@@ -42,7 +42,18 @@ export class AppService {
 
     return todo;
   }
-  deleteTodo(id: string): string {
-    return 'Hello World!';
+  async deleteTodo(id: string): Promise<number> {
+    const todo = await this.todoRepo.findOne(id);
+    if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
+
+    const result: DeleteResult = await this.todoRepo.delete(id);
+
+    if (!result.affected)
+      throw new HttpException(
+        '할일 삭제에 실패했습니다',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+
+    return result.affected;
   }
 }

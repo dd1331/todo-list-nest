@@ -85,6 +85,7 @@ describe('AppController (e2e)', () => {
       },
     );
   });
+
   describe('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', () => {
     it('PUT /todos/:id: 투두 디테일 상태 변경 성공 ', async () => {
       const { id, status, updatedAt } = createdTodos[0];
@@ -97,10 +98,23 @@ describe('AppController (e2e)', () => {
       expect(body.updatedAt).not.toBe(updatedAt);
     });
   });
-  it('DELETE /todos/:id: 투두 삭제', async () => {
-    const id = 1;
-    const res = await request(agent)
-      .delete(`/todos/${id}`)
-      .expect(HttpStatus.OK);
+
+  describe('DELETE /todos/:id: 투두 삭제', () => {
+    const invalidIdParams = [-3, '-3', 'test', 0, null];
+    each(invalidIdParams).it(
+      'DELETE /todos/:id: 투두 삭제 실패',
+      async (id) => {
+        await request(agent)
+          .delete(`/todos/${id}`)
+          .expect(HttpStatus.BAD_REQUEST);
+      },
+    );
+    it('DELETE /todos/:id: 투두 삭제 성공', async () => {
+      const { id } = createdTodos[0];
+      const { text } = await request(agent)
+        .delete(`/todos/${id}`)
+        .expect(HttpStatus.OK);
+      expect(text).toBe('1');
+    });
   });
 });

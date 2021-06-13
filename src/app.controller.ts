@@ -36,7 +36,7 @@ export class AppController {
   }
 
   @Delete('/todos/:id')
-  deleteTodo(@Param('id') id: string): string {
+  deleteTodo(@Param('id') id: string): Promise<number> {
     return this.appService.deleteTodo(id);
   }
 }
