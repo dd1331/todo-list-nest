@@ -3,6 +3,7 @@ import { CreateTodoDto } from './create-todo.dto';
 import { Repository } from 'typeorm';
 import { Todo } from './todo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TODO_NOT_FOUND } from './http-messages';
 
 @Injectable()
 export class AppService {
@@ -14,17 +15,22 @@ export class AppService {
     return todos;
   }
   async createTodo(dto: CreateTodoDto): Promise<Todo> {
-    const todo = await this.todoRepo.create(dto);
-    await todo.save();
-    if (!todo)
+    const todos = await this.todoRepo.create(dto);
+    await todos.save();
+    if (!todos)
       throw new HttpException(
         '할일 추가에 실패했습니다',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    return todo;
+    return todos;
   }
-  getTodo(id: string): string {
-    return 'Hello World!';
+  async getTodo(id: string): Promise<Todo> {
+    console.log(id);
+    const todo = await this.todoRepo.findOne(id);
+
+    if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
+
+    return todo;
   }
   toggleTodoStatus(id: string): string {
     return 'Hello World!';

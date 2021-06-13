@@ -16,7 +16,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/todos')
-  getTodoList(): string {
+  getTodoList(): Promise<Todo[]> {
     return this.appService.getTodoList();
   }
 
@@ -26,7 +26,7 @@ export class AppController {
   }
 
   @Get('/todos/:id')
-  getTodo(@Param('id') id: string): string {
+  getTodo(@Param('id') id: string): Promise<Todo> {
     return this.appService.getTodo(id);
   }
 

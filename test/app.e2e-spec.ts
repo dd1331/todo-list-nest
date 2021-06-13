@@ -68,9 +68,22 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  it('GET /todos/:id: 투두 디테일 데이터 가져오기', async () => {
-    const id = 1;
-    const res = await request(agent).get(`/todos/${id}`).expect(HttpStatus.OK);
+  describe('GET /todos/:id: 투두 디테일 데이터 가져오기', () => {
+    it('GET /todos/:id: 투두 디테일 데이터 가져오기 성공', async () => {
+      const { id } = createdTodos[0];
+      const { body } = await request(agent)
+        .get(`/todos/${id}`)
+        .expect(HttpStatus.OK);
+      expect(body).toEqual(createdTodos[0]);
+    });
+
+    const invalidIdParams = [-3, '-3', 'test', 0, null];
+    each(invalidIdParams).it(
+      'GET /todos/:id: 투두 디테일 데이터 가져오기 실패',
+      async (id) => {
+        await request(agent).get(`/todos/${id}`).expect(HttpStatus.BAD_REQUEST);
+      },
+    );
   });
 
   it('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', async () => {
