@@ -25,10 +25,6 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /todos: 투두 리스트', async () => {
-    const res = await request(agent).get('/todos').expect(HttpStatus.OK);
-  });
-
   describe('POST /todos: 투두 만들기', () => {
     const validCreateParams: CreateTodoDto[] = [
       { title: '제목1', content: '내용1' },
@@ -62,6 +58,14 @@ describe('AppController (e2e)', () => {
         expect(body.message).toContain(payload.message);
       },
     );
+  });
+  describe('GET /todos: 투두 리스트', () => {
+    it('GET /todos: 투두 리스트 가져오기 성공', async () => {
+      const { body } = await request(agent).get('/todos').expect(HttpStatus.OK);
+
+      expect(body).toHaveLength(createdTodos.length);
+      expect(body).toEqual(createdTodos);
+    });
   });
 
   it('GET /todos/:id: 투두 디테일 데이터 가져오기', async () => {

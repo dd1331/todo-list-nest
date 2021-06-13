@@ -9,8 +9,9 @@ export class AppService {
   constructor(
     @InjectRepository(Todo) private readonly todoRepo: Repository<Todo>,
   ) {}
-  getTodoList(): string {
-    return 'Hello World!';
+  async getTodoList(): Promise<Todo[]> {
+    const todos = await this.todoRepo.find();
+    return todos;
   }
   async createTodo(dto: CreateTodoDto): Promise<Todo> {
     const todo = await this.todoRepo.create(dto);
