@@ -117,16 +117,20 @@ describe('AppController (e2e)', () => {
   });
 
   describe('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', () => {
-    it('PUT /todos/:id: 투두 디테일 상태 변경 성공 ', async () => {
-      const { id, status, updatedAt } = createdTodos[0];
-      const updatedStatus = status === 'todo' ? 'done' : 'todo';
-      const { body } = await request(agent)
-        .put(`/todos/${id}`)
-        .expect(HttpStatus.OK);
-      expect(body.status).toBeDefined();
-      expect(body.status).toBe(updatedStatus);
-      expect(body.updatedAt).not.toBe(updatedAt);
-    });
+    const statusParams = ['done', 'todo', 'done', 'todo'];
+    each(statusParams).it(
+      'PUT /todos/:id: 투두 디테일 상태 변경 성공 ',
+      async (param) => {
+        const { id, updatedAt } = createdTodos[0];
+        const updatedStatus = param;
+        const { body } = await request(agent)
+          .put(`/todos/${id}`)
+          .expect(HttpStatus.OK);
+        expect(body.status).toBeDefined();
+        expect(body.status).toBe(updatedStatus);
+        expect(body.updatedAt).not.toBe(updatedAt);
+      },
+    );
   });
 
   describe('DELETE /todos/:id: 투두 삭제', () => {

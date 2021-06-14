@@ -87,6 +87,7 @@ export class AppService {
     const todo = await this.getTodoOrFail(id);
 
     if (todo.status === 'todo') todo.status = 'done';
+    else todo.status = 'todo';
 
     await todo.save();
 
