@@ -16,7 +16,9 @@ export class AppService {
   }
   async createTodo(dto: CreateTodoDto): Promise<Todo> {
     const todos = await this.todoRepo.create(dto);
+
     await todos.save();
+
     if (!todos)
       throw new HttpException(
         '할일 추가에 실패했습니다',
@@ -24,7 +26,7 @@ export class AppService {
       );
     return todos;
   }
-  async getTodo(id: string): Promise<Todo> {
+  async getTodoOrFail(id: string): Promise<Todo> {
     const todo = await this.todoRepo.findOne(id);
 
     if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
@@ -32,9 +34,7 @@ export class AppService {
     return todo;
   }
   async toggleTodoStatus(id: string): Promise<Todo> {
-    const todo = await this.todoRepo.findOne(id);
-
-    if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
+    const todo = await this.getTodoOrFail(id);
 
     if (todo.status === 'todo') todo.status = 'done';
 
@@ -43,8 +43,7 @@ export class AppService {
     return todo;
   }
   async deleteTodo(id: string): Promise<number> {
-    const todo = await this.todoRepo.findOne(id);
-    if (!todo) throw new HttpException(TODO_NOT_FOUND, HttpStatus.BAD_REQUEST);
+    await this.getTodoOrFail(id);
 
     const result: DeleteResult = await this.todoRepo.delete(id);
 

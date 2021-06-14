@@ -27,7 +27,7 @@ export class AppController {
 
   @Get('/todos/:id')
   getTodo(@Param('id') id: string): Promise<Todo> {
-    return this.appService.getTodo(id);
+    return this.appService.getTodoOrFail(id);
   }
 
   @Put('/todos/:id')
