@@ -4,6 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_PIPE } from '@nestjs/core';
 import { Todo } from './todo.entity';
+import { TodoDtoMiniimizer } from './todo-dto-minimizer';
+import { TodoDtoMaximizer } from './todo-dto-maximizer';
+import { TodoFormatAdapter } from './todo-format-adapter';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { Todo } from './todo.entity';
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
+    TodoDtoMaximizer,
+    TodoDtoMiniimizer,
+    TodoFormatAdapter,
   ],
 })
 export class AppModule {}

@@ -4,15 +4,29 @@ import { Repository, DeleteResult } from 'typeorm';
 import { Todo } from './todo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TODO_NOT_FOUND } from './http-messages';
+import { TodoDtoMiniimizer } from './todo-dto-minimizer';
+import { TodoDtoMaximizer } from './todo-dto-maximizer';
+import { DifferentTodoDto } from './different-todo.dto';
+import { TodoFormatAdapter } from './todo-format-adapter';
+import { TodoDto } from './todo.dto';
+import { MinimizedTodoDto } from './minimized-todo.dto';
 
 @Injectable()
 export class AppService {
   constructor(
     @InjectRepository(Todo) private readonly todoRepo: Repository<Todo>,
+    private readonly todoDtoMiniimizer: TodoDtoMiniimizer,
+    private readonly todoDtoMaximizer: TodoDtoMaximizer,
+    private readonly todoFormatAdapter: TodoFormatAdapter,
   ) {}
-  async getTodoList(): Promise<Todo[]> {
-    const todos = await this.todoRepo.find();
-    return todos;
+  async getTodoList(): Promise<TodoDto[]> {
+    const todos: Todo[] = await this.todoRepo.find();
+    const todoDtos: TodoDto[] = this.processTodos(todos);
+
+    return todoDtos;
+  }
+  processTodos(todos: Todo[]): TodoDto[] {
+    return this.todoDtoMaximizer.processJobs(todos);
   }
   async createTodo(dto: CreateTodoDto): Promise<Todo> {
     const todos = await this.todoRepo.create(dto);
@@ -33,6 +47,42 @@ export class AppService {
 
     return todo;
   }
+
+  async getTodoDetail(id: string): Promise<TodoDto> {
+    const todo: Todo = await this.getTodoOrFail(id);
+
+    return todo;
+  }
+
+  async getTodoSimpleDetail(id: string): Promise<MinimizedTodoDto> {
+    const todo: TodoDto = await this.getTodoOrFail(id);
+    const [result] = this.todoDtoMiniimizer.processJobs([todo]);
+    return result;
+  }
+
+  async getTodoDetailInDifferentFormat(id: string): Promise<TodoDto> {
+    const todo: Todo = await this.getTodoOrFail(id);
+    const { title, content, ...rest } = todo;
+    const sampleDifferentTodoDto: DifferentTodoDto[] = [
+      {
+        subject: title,
+        detail: content,
+        ...rest,
+      },
+    ];
+    const [result]: TodoDto[] = this.todoFormatAdapter.processJobs(
+      sampleDifferentTodoDto,
+    );
+    return result;
+  }
+  async getTodoSimpleDetailWithDifferentFormat(
+    id: string,
+  ): Promise<MinimizedTodoDto> {
+    const todo: TodoDto = await this.getTodoDetailInDifferentFormat(id);
+    const [result] = this.todoDtoMiniimizer.processJobs([todo]);
+    return result;
+  }
+
   async toggleTodoStatus(id: string): Promise<Todo> {
     const todo = await this.getTodoOrFail(id);
 

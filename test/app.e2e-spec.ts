@@ -3,14 +3,15 @@ import { INestApplication, HttpStatus } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import each from 'jest-each';
-import { Todo } from 'src/todo.entity';
 import { CreateTodoDto } from 'src/create-todo.dto';
 import { CONTENT_REQUIRED, TITLE_REQUIRED } from '../src/http-messages';
+import { TodoDto } from 'src/todo.dto';
+import { MinimizedTodoDto } from 'src/minimized-todo.dto';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let agent;
-  const createdTodos: Todo[] = [];
+  const createdTodos: TodoDto[] = [];
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -64,7 +65,10 @@ describe('AppController (e2e)', () => {
       const { body } = await request(agent).get('/todos').expect(HttpStatus.OK);
 
       expect(body).toHaveLength(createdTodos.length);
-      expect(body).toEqual(createdTodos);
+      body.map((todo, index) => {
+        expect(todo.title).toBe(createdTodos[index].title);
+        expect(todo.content).toBe(createdTodos[index].content);
+      });
     });
   });
 
@@ -84,6 +88,32 @@ describe('AppController (e2e)', () => {
         await request(agent).get(`/todos/${id}`).expect(HttpStatus.BAD_REQUEST);
       },
     );
+
+    it('GET /todos/:id: 투두 심플 디테일 데이터 가져오기 성공', async () => {
+      const { id, content, ...rest } = createdTodos[0];
+      const simpleCreatedTodo: MinimizedTodoDto = { id, ...rest };
+      const { body } = await request(agent)
+        .get(`/todos-simple/${id}`)
+        .expect(HttpStatus.OK);
+      expect(body).toEqual(simpleCreatedTodo);
+    });
+
+    it('GET /todos-different/:id: 투두 다른 포맷 투두 디테일 데이터 가져오기 성공', async () => {
+      const { id } = createdTodos[0];
+      const { body } = await request(agent)
+        .get(`/todos-different/${id}`)
+        .expect(HttpStatus.OK);
+      expect(body).toEqual(createdTodos[0]);
+    });
+
+    it('GET /todos-simple-different/:id: 투두 다른 포맷 투두 디테일 데이터 가져오기 성공', async () => {
+      const { id, content, ...rest } = createdTodos[0];
+      const simpleCreatedTodo: MinimizedTodoDto = { id, ...rest };
+      const { body } = await request(agent)
+        .get(`/todos-simple-different/${id}`)
+        .expect(HttpStatus.OK);
+      expect(body).toEqual(simpleCreatedTodo);
+    });
   });
 
   describe('PUT /todos/:id: 투두 디테일 상태 변경 (완료, 미완료)', () => {
