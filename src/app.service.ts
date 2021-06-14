@@ -10,6 +10,7 @@ import { DifferentTodoDto } from './different-todo.dto';
 import { TodoFormatAdapter } from './todo-format-adapter';
 import { TodoDto } from './todo.dto';
 import { MinimizedTodoDto } from './minimized-todo.dto';
+import { RefinerFactory } from './refiner-factory';
 
 @Injectable()
 export class AppService {
@@ -18,6 +19,7 @@ export class AppService {
     private readonly todoDtoMiniimizer: TodoDtoMiniimizer,
     private readonly todoDtoMaximizer: TodoDtoMaximizer,
     private readonly todoFormatAdapter: TodoFormatAdapter,
+    private readonly refinerFactory: RefinerFactory,
   ) {}
   async getTodoList(): Promise<TodoDto[]> {
     const todos: Todo[] = await this.todoRepo.find();
@@ -78,8 +80,22 @@ export class AppService {
   async getTodoSimpleDetailWithDifferentFormat(
     id: string,
   ): Promise<MinimizedTodoDto> {
-    const todo: TodoDto = await this.getTodoDetailInDifferentFormat(id);
-    const [result] = this.todoDtoMiniimizer.processJobs([todo]);
+    const todo: Todo = await this.getTodoOrFail(id);
+    const { title, content, ...rest } = todo;
+    const sampleDifferentTodoDto: DifferentTodoDto[] = [
+      {
+        subject: title,
+        detail: content,
+        ...rest,
+      },
+    ];
+    this.refinerFactory.setRefiners([
+      this.todoFormatAdapter,
+      this.todoDtoMiniimizer,
+    ]);
+    const refiner = this.refinerFactory.getRefiner();
+    const [result] = refiner(sampleDifferentTodoDto);
+
     return result;
   }
 

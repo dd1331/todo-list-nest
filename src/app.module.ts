@@ -7,6 +7,7 @@ import { Todo } from './todo.entity';
 import { TodoDtoMiniimizer } from './todo-dto-minimizer';
 import { TodoDtoMaximizer } from './todo-dto-maximizer';
 import { TodoFormatAdapter } from './todo-format-adapter';
+import { RefinerFactory } from './refiner-factory';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TodoFormatAdapter } from './todo-format-adapter';
     TodoDtoMaximizer,
     TodoDtoMiniimizer,
     TodoFormatAdapter,
+    RefinerFactory,
   ],
 })
 export class AppModule {}
